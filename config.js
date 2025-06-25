@@ -7,8 +7,10 @@ const __dirname = dirname(__filename);
 
 dotenv.config({ path: resolve(__dirname, ".env") });
 
-export const config = {
+const config = {
   port: process.env.PORT,
   mongo_url: process.env.MONGO_URL,
   password: process.env.PASSWORD,
 };
+
+export default config;

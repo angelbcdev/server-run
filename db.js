@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import { config } from "./config.js";
+import config from "./config.js";
 // Use path.resolve for cross-platform compatibility
 
 const url = config.mongo_url;

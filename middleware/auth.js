@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { config } from "../config.js";
+import config from "../config.js";
 
 const password = config.password;
 if (!password) {

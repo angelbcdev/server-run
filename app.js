@@ -1,5 +1,5 @@
 import express from "express";
-import { config } from "../server/config.js";
+import config from "./config.js";
 
 import cors from "cors";
 // Adjust the import path as necessary
