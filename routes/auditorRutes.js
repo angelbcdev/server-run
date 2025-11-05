@@ -14,7 +14,9 @@ routerAuditor.get("/", (req, res) => {
 });
 
 routerAuditor.get("/auditor", (req, res) => {
-  getAuditors()
+  const { dcNbr } = req.query;
+
+  getAuditors(dcNbr)
     .then((auditors) => {
       res.json({
         status: true,
@@ -81,9 +83,8 @@ routerAuditor.post("/goal", (req, res) => {
       });
     });
 });
-routerAuditor.get("/goal/:year", (req, res) => {
-  // const { year } = req.params;
-  const { year } = req.params; // If you want to use query parameters instead
+routerAuditor.get("/goal", (req, res) => {
+  const { year, dcNbr } = req.query; // If you want to use query parameters instead
 
   if (!year) {
     return res.status(400).json({
@@ -92,7 +93,7 @@ routerAuditor.get("/goal/:year", (req, res) => {
     });
   }
 
-  getGoalsByYear(year.slice(1)) // Assuming year is in the format "/YYYY"
+  getGoalsByYear(year, dcNbr) // Assuming year is in the format "/YYYY"
     .then((goals) => {
       res.json({
         status: true,

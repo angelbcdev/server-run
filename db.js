@@ -6,12 +6,17 @@ const url = config.mongo_url;
 
 const client = new MongoClient(url);
 
+const ENDPOINTSDB = {
+  DB: "warehouse",
+  COLLECTION: { AUDITOR: "auditor_production", GOAL: "goal2" },
+};
+
 async function main() {
   try {
     await client.connect();
     // const collections = await client.db("TodoList").collections(); // get all collections
     const collections = await client
-      .db("warehouse")
+      .db(ENDPOINTSDB.DB)
       .collection("auditor")
       .find()
       .toArray();
@@ -20,20 +25,6 @@ async function main() {
     const collection = db.collection("user");
     const result = collection.find();
     const user = await result.toArray();
-    // const result = await collection.insertOne({
-    //   name: "angel",
-    //   age: 20,
-    //   status: "A",
-    //   groups: ["Sports", "Dance", "Music"],
-    // });
-
-    console.log("Connected successfully to server");
-
-    // console.log("collections", user[0].groups);
-
-    // collections.forEach((element) => {
-    //   console.log("element--", element);
-    // });
   } catch (error) {
     console.log("error", error);
   } finally {
@@ -44,8 +35,10 @@ async function main() {
 async function saveAuditor(params) {
   try {
     await client.connect();
-    const db = client.db("warehouse");
-    const collection = db.collection("auditor");
+    const db = client.db(ENDPOINTSDB.DB);
+    const collection = db.collection(ENDPOINTSDB.COLLECTION.AUDITOR);
+
+    console.log("params.positionHistory", params.positionHistory);
 
     await collection.updateOne(
       { id: params.id },
@@ -59,13 +52,13 @@ async function saveAuditor(params) {
   }
 }
 
-async function getAuditors() {
+async function getAuditors(dcNbr) {
   try {
     await client.connect();
-    const db = client.db("warehouse");
-    const collection = db.collection("auditor");
+    const db = client.db(ENDPOINTSDB.DB);
+    const collection = db.collection(ENDPOINTSDB.COLLECTION.AUDITOR);
 
-    const result = await collection.find().toArray();
+    const result = await collection.find({ dcNbr }).toArray();
 
     return result;
   } catch (error) {
@@ -78,8 +71,8 @@ async function getAuditors() {
 async function saveGoal(params) {
   try {
     await client.connect();
-    const db = client.db("warehouse");
-    const collection = db.collection("goal");
+    const db = client.db(ENDPOINTSDB.DB);
+    const collection = db.collection(ENDPOINTSDB.COLLECTION.GOAL);
 
     await collection.updateOne(
       { fiscalQuarter: params.fiscalQuarter },
@@ -93,14 +86,14 @@ async function saveGoal(params) {
   }
 }
 
-async function getGoalsByYear(date) {
+async function getGoalsByYear(year, dcNbr) {
   try {
     await client.connect();
-    const db = client.db("warehouse");
-    const collection = db.collection("goal");
+    const db = client.db(ENDPOINTSDB.DB);
+    const collection = db.collection(ENDPOINTSDB.COLLECTION.GOAL);
 
     const result = await collection
-      .find({ idYear: date })
+      .find({ year, dcNbr })
       .sort({ fiscalQuarter: 1 })
       .toArray();
 
@@ -111,13 +104,5 @@ async function getGoalsByYear(date) {
     await client.close();
   }
 }
-
-// getGoalsByYear("2024")
-//   .then((goals) => {
-//     console.log("Goals for 2023:", goals.length);
-//   })
-//   .catch((error) => {
-//     console.error("Error fetching goals:", error);
-//   });
 
 export { saveAuditor, getAuditors, saveGoal, getGoalsByYear };
