@@ -3,6 +3,15 @@ import { getAuditors, saveAuditor, saveGoal, getGoalsByYear } from "../db.js";
 
 const routerAuditor = Router();
 
+/**
+ *  REMEMBER server has other git to update any change
+ */
+
+const ENDPOINTS = {
+  AUDITOR: "/auditor",
+  GOAL: "/goal",
+};
+
 routerAuditor.get("/", (req, res) => {
   setTimeout(() => {
     res.json({
@@ -13,10 +22,10 @@ routerAuditor.get("/", (req, res) => {
   }, 200);
 });
 
-routerAuditor.get("/auditor", (req, res) => {
-  const { dcNbr } = req.query;
+routerAuditor.get(ENDPOINTS.AUDITOR, (req, res) => {
+  const { dcNbr, year } = req.query;
 
-  getAuditors(dcNbr)
+  getAuditors(dcNbr, year)
     .then((auditors) => {
       res.json({
         status: true,
@@ -32,7 +41,7 @@ routerAuditor.get("/auditor", (req, res) => {
     });
 });
 
-routerAuditor.post("/auditor", (req, res) => {
+routerAuditor.post(ENDPOINTS.AUDITOR, (req, res) => {
   const { data } = req.body;
 
   if (!data) {
@@ -58,7 +67,7 @@ routerAuditor.post("/auditor", (req, res) => {
     });
 });
 
-routerAuditor.post("/goal", (req, res) => {
+routerAuditor.post(ENDPOINTS.GOAL, (req, res) => {
   const { data } = req.body || {};
 
   if (!data) {
@@ -83,8 +92,8 @@ routerAuditor.post("/goal", (req, res) => {
       });
     });
 });
-routerAuditor.get("/goal", (req, res) => {
-  const { year, dcNbr } = req.query; // If you want to use query parameters instead
+routerAuditor.get(ENDPOINTS.GOAL, (req, res) => {
+  const { year, dcNbr } = req.query;
 
   if (!year) {
     return res.status(400).json({

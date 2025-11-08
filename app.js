@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 
 import cors from "cors";
-import { getAuditors, saveAuditor, saveGoal, getGoalsByYear } from "./db.js"; // Adjust the import path as necessary
+
 import config from "./config.js";
 import routerAuditor from "./routes/auditorRutes.js";
 import authMiddleware from "./middleware/auth.js";
@@ -22,3 +22,7 @@ app.listen(PORT, () => {
 });
 
 export default app;
+
+/**
+ *  REMEMBER server has other git to update any change
+ */

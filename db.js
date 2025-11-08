@@ -1,6 +1,8 @@
 import { MongoClient } from "mongodb";
 import config from "./config.js";
-// Use path.resolve for cross-platform compatibility
+/**
+ *  REMEMBER server has other git to update any change
+ */
 
 const url = config.mongo_url;
 
@@ -11,38 +13,28 @@ const ENDPOINTSDB = {
   COLLECTION: { AUDITOR: "auditor_production", GOAL: "goal2" },
 };
 
-async function main() {
-  try {
-    await client.connect();
-    // const collections = await client.db("TodoList").collections(); // get all collections
-    const collections = await client
-      .db(ENDPOINTSDB.DB)
-      .collection("auditor")
-      .find()
-      .toArray();
-
-    const db = client.db("TodoList");
-    const collection = db.collection("user");
-    const result = collection.find();
-    const user = await result.toArray();
-  } catch (error) {
-    console.log("error", error);
-  } finally {
-    await client.close();
-  }
-}
-
 async function saveAuditor(params) {
   try {
     await client.connect();
     const db = client.db(ENDPOINTSDB.DB);
     const collection = db.collection(ENDPOINTSDB.COLLECTION.AUDITOR);
 
-    console.log("params.positionHistory", params.positionHistory);
+    // 1️⃣ Buscar documento actual
+    const existing = await collection.findOne({ id: params.id });
+
+    if (!existing) {
+      await collection.insertOne(params);
+      return;
+    }
+
+    existing.positionHistory = {
+      ...existing.positionHistory,
+      ...params.positionHistory,
+    };
 
     await collection.updateOne(
       { id: params.id },
-      { $set: params },
+      { $set: existing },
       { upsert: true }
     );
   } catch (error) {
@@ -52,13 +44,15 @@ async function saveAuditor(params) {
   }
 }
 
-async function getAuditors(dcNbr) {
+async function getAuditors(dcNbr, year) {
   try {
     await client.connect();
     const db = client.db(ENDPOINTSDB.DB);
     const collection = db.collection(ENDPOINTSDB.COLLECTION.AUDITOR);
 
-    const result = await collection.find({ dcNbr }).toArray();
+    const result = await collection
+      .find({ dcNbr, [`positionHistory.${year}`]: { $exists: true } })
+      .toArray();
 
     return result;
   } catch (error) {
@@ -75,7 +69,7 @@ async function saveGoal(params) {
     const collection = db.collection(ENDPOINTSDB.COLLECTION.GOAL);
 
     await collection.updateOne(
-      { fiscalQuarter: params.fiscalQuarter },
+      { fiscalQuarter: params.fiscalQuarter, dcNbr: params.dcNbr },
       { $set: params },
       { upsert: true }
     );
