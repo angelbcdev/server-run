@@ -9,8 +9,8 @@ const url = config.mongo_url;
 const client = new MongoClient(url);
 
 const ENDPOINTSDB = {
-  DB: "warehouse",
-  COLLECTION: { AUDITOR: "auditor_production", GOAL: "goal2" },
+  DB: config.db,
+  COLLECTION: config.collection,
 };
 
 async function saveAuditor(params) {
