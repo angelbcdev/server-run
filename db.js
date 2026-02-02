@@ -35,7 +35,7 @@ async function saveAuditor(params) {
     await collection.updateOne(
       { id: params.id },
       { $set: existing },
-      { upsert: true }
+      { upsert: true },
     );
   } catch (error) {
     console.error("Error inserting data:", error);
@@ -54,7 +54,14 @@ async function getAuditors(dcNbr, year) {
       .find({ dcNbr, [`positionHistory.${year}`]: { $exists: true } })
       .toArray();
 
-    return result;
+    if (result.length > 0) {
+      return result;
+    } else {
+      //* call old year for the same dcNbr
+      return await collection
+        .find({ dcNbr, [`positionHistory.${year - 1}`]: { $exists: true } })
+        .toArray();
+    }
   } catch (error) {
     console.error("Error retrieving data:", error);
   } finally {
@@ -71,7 +78,7 @@ async function saveGoal(params) {
     await collection.updateOne(
       { fiscalQuarter: params.fiscalQuarter, dcNbr: params.dcNbr },
       { $set: params },
-      { upsert: true }
+      { upsert: true },
     );
   } catch (error) {
     console.error("Error saving goal:", error);
