@@ -54,14 +54,9 @@ async function getAuditors(dcNbr, year) {
       .find({ dcNbr, [`positionHistory.${year}`]: { $exists: true } })
       .toArray();
 
-    if (result.length > 0) {
+    
       return result;
-    } else {
-      //* call old year for the same dcNbr
-      return await collection
-        .find({ dcNbr, [`positionHistory.${year - 1}`]: { $exists: true } })
-        .toArray();
-    }
+ 
   } catch (error) {
     console.error("Error retrieving data:", error);
   } finally {
